@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+
+# Database (will be recreated on deployment)
+backend/database/*.db
+backend/database/*.db-*
+
+# Uploaded files
+backend/uploads/*.xlsx
+backend/uploads/original-*
+!backend/uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# Testing
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
