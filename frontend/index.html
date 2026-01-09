@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sephora - Questionnaire de Sécurité</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Login Form */
+        .login-form {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            border-color: #667eea;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        /* Questions */
+        .question-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .question-item:hover {
+            border-color: #667eea;
+        }
+
+        .question-item.answered {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .question-id {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .question-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .question-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .question-response {
+            margin-top: 15px;
+        }
+
+        .saved-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="container">
+        <div class="card login-form">
+            <h1 style="text-align: center; margin-bottom: 30px;">Sephora Questionnaire</h1>
+            <div id="loginError" class="error hidden"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Se connecter</button>
+            </form>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="color: #666; font-size: 14px;"><strong>Comptes disponibles:</strong></p>
+                <p style="color: #666; font-size: 13px;">• admin / admin123</p>
+                <p style="color: #666; font-size: 13px;">• olivier / olivier123</p>
+                <p style="color: #666; font-size: 13px;">• paul / paul123</p>
+                <p style="color: #666; font-size: 13px;">• imane / imane123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container hidden">
+        <!-- Header -->
+        <div class="header">
+            <div class="user-info">
+                <div>
+                    <h1>Questionnaire de Sécurité Sephora</h1>
+                    <p>Bienvenue <span class="user-name" id="userName"></span></p>
+                </div>
+                <button class="logout-btn" onclick="logout()">Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-value" id="totalQuestions">0</div>
+                <div class="stat-label">Questions totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedQuestions">0</div>
+                <div class="stat-label">Questions répondues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="progressPercentage">0%</div>
+                <div class="stat-label">Progression</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="sheetsContainer"></div>
+
+        <!-- Search -->
+        <div class="card search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Rechercher une question...">
+        </div>
+
+        <!-- Questions -->
+        <div class="card">
+            <div id="questionsContainer" class="loading">Chargement...</div>
+        </div>
+
+        <!-- Export -->
+        <div class="card export-section">
+            <h3 style="margin-bottom: 15px;">Exporter le questionnaire</h3>
+            <p style="color: #666; margin-bottom: 15px;">Téléchargez le fichier Excel avec toutes vos réponses</p>
+            <button class="btn-success" onclick="exportExcel()">📥 Télécharger le questionnaire complété (Excel)</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Auto-détecte l'URL de l'API
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3001'
+            : window.location.origin;
+
+        let token = localStorage.getItem('token');
+        let currentUser = null;
+        let currentSheet = null;
+        let allQuestions = [];
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    token = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    showMainApp();
+                } else {
+                    showError('loginError', data.error || 'Erreur de connexion');
+                }
+            } catch (error) {
+                showError('loginError', 'Erreur de connexion au serveur');
+            }
+        });
+
+        // Logout
+        function logout() {
+            token = null;
+            currentUser = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        // Show main app
+        async function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
+
+            await loadStats();
+            await loadSheets();
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/questionnaire/stats`);
+                const data = await response.json();
+
+                document.getElementById('totalQuestions').textContent = data.overall.total;
+                document.getElementById('completedQuestions').textContent = data.overall.completed;
+                document.getElementById('progressPercentage').textContent = data.overall.percentage + '%';
+                document.getElementById('progressBar').style.width = data.overall.percentage + '%';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load sheets (tabs)
+        async function loadSheets() {
+            try {
+                const response = await fetch(`${API_URL}/api/questionnaire/sheets`);
+                const sheets = await response.json();
+
+                const container = document.getElementById('sheetsContainer');
+                container.innerHTML = sheets.map(sheet => `
+                    <div class="tab ${currentSheet === sheet.id ? 'active' : ''}" onclick="selectSheet(${sheet.id})">
+                        ${sheet.display_name}
+                    </div>
+                `).join('');
+
+                if (!currentSheet && sheets.length > 0) {
+                    selectSheet(sheets[0].id);
+                }
+            } catch (error) {
+                console.error('Error loading sheets:', error);
+            }
+        }
+
+        // Select sheet
+        async function selectSheet(sheetId) {
+            currentSheet = sheetId;
+            await loadSheets();
+            await loadQuestions(sheetId);
+        }
+
+        // Load questions
+        async function loadQuestions(sheetId) {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '<div class="loading">Chargement des questions...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/questionnaire/sheets/${sheetId}/questions`);
+                allQuestions = await response.json();
+                displayQuestions(allQuestions);
+            } catch (error) {
+                container.innerHTML = '<div class="error">Erreur de chargement des questions</div>';
+            }
+        }
+
+        // Display questions
+        function displayQuestions(questions) {
+            const container = document.getElementById('questionsContainer');
+
+            if (questions.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">Aucune question trouvée</p>';
+                return;
+            }
+
+            container.innerHTML = questions.map(q => `
+                <div class="question-item ${q.response_text ? 'answered' : ''}" id="question-${q.id}">
+                    <div class="question-header">
+                        <span class="question-id">${q.question_id || 'Q' + q.id}</span>
+                        ${q.response_text ? '<span class="saved-badge">✓ Répondu</span>' : ''}
+                    </div>
+                    ${q.title ? `<div class="question-title">${q.title}</div>` : ''}
+                    ${q.description ? `<div class="question-description">${q.description}</div>` : ''}
+                    ${q.question_text ? `<div class="question-description">${q.question_text}</div>` : ''}
+                    <div class="question-response">
+                        <textarea id="response-${q.id}" placeholder="Votre réponse...">${q.response_text || ''}</textarea>
+                        <button onclick="saveResponse(${q.id})" style="margin-top: 10px;">💾 Sauvegarder</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Save response
+        async function saveResponse(questionId) {
+            const textarea = document.getElementById(`response-${questionId}`);
+            const responseText = textarea.value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/questionnaire/questions/${questionId}/response`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        response_text: responseText,
+                        user_id: currentUser.id
+                    })
+                });
+
+                if (response.ok) {
+                    // Update UI
+                    const questionItem = document.getElementById(`question-${questionId}`);
+                    questionItem.classList.add('answered');
+
+                    const header = questionItem.querySelector('.question-header');
+                    if (!header.querySelector('.saved-badge')) {
+                        header.innerHTML += '<span class="saved-badge">✓ Répondu</span>';
+                    }
+
+                    // Reload stats
+                    await loadStats();
+
+                    alert('✅ Réponse sauvegardée!');
+                } else {
+                    alert('❌ Erreur lors de la sauvegarde');
+                }
+            } catch (error) {
+                alert('❌ Erreur de connexion');
+            }
+        }
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const filtered = allQuestions.filter(q =>
+                (q.title && q.title.toLowerCase().includes(search)) ||
+                (q.description && q.description.toLowerCase().includes(search)) ||
+                (q.question_text && q.question_text.toLowerCase().includes(search))
+            );
+            displayQuestions(filtered);
+        });
+
+        // Export Excel
+        function exportExcel() {
+            window.open(`${API_URL}/api/excel/export`, '_blank');
+        }
+
+        // Show error
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        // Auto-login if token exists
+        if (token) {
+            const user = localStorage.getItem('user');
+            if (user) {
+                currentUser = JSON.parse(user);
+                showMainApp();
+            }
+        }
+    </script>
+</body>
+</html>
