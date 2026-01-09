@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sephora-questionnaire
+    runtime: node
+    region: frankfurt
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: ./database/questionnaire.db
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
