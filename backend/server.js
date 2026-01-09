@@ -2,7 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { initDatabase } = require('./models/database');
+const fs = require('fs');
+const { initDatabase, getOne } = require('./models/database');
+const { importExcel } = require('./controllers/excelController');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,8 +50,57 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Auto-initialize database with sample data on first run
+async function autoInitialize() {
+    try {
+        // Check if users exist
+        const userExists = await getOne('SELECT COUNT(*) as count FROM users');
+
+        if (!userExists || userExists.count === 0) {
+            console.log('🔧 First run detected - Auto-initializing database...');
+
+            // Create default admin user
+            const hashedPassword = await bcrypt.hash('admin123', 10);
+            const { runQuery } = require('./models/database');
+            await runQuery(
+                'INSERT INTO users (username, email, password, full_name, role) VALUES (?, ?, ?, ?, ?)',
+                ['admin', 'admin@sephora.local', hashedPassword, 'Administrator', 'admin']
+            );
+
+            // Create sample users
+            const sampleUsers = [
+                { username: 'olivier', email: 'olivier@sephora.local', name: 'Olivier Adler', password: 'olivier123' },
+                { username: 'paul', email: 'paul@sephora.local', name: 'Paul Blaise', password: 'paul123' },
+                { username: 'imane', email: 'imane@sephora.local', name: 'Imane Miloud', password: 'imane123' }
+            ];
+
+            for (const user of sampleUsers) {
+                const hashedPwd = await bcrypt.hash(user.password, 10);
+                await runQuery(
+                    'INSERT INTO users (username, email, password, full_name) VALUES (?, ?, ?, ?)',
+                    [user.username, user.email, hashedPwd, user.name]
+                );
+            }
+
+            // Import Excel questionnaire
+            const excelPath = path.join(__dirname, 'SEPHORA - 3rd Party Security Framework.xlsx');
+            if (fs.existsSync(excelPath)) {
+                console.log('📥 Importing Excel questionnaire...');
+                await importExcel(excelPath);
+                console.log('✅ Auto-initialization complete!');
+            } else {
+                console.log('⚠️ Excel file not found, skipping import');
+            }
+        }
+    } catch (error) {
+        console.error('Auto-initialization error:', error.message);
+        // Continue anyway - don't crash the server
+    }
+}
+
 // Initialize database and start server
 initDatabase()
+    .then(() => autoInitialize())
     .then(() => {
         app.listen(PORT, () => {
             console.log('');
